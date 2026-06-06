@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Training Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0e1a;
+      --card: #111827;
+      --border: #1e2d45;
+      --accent: #00d4ff;
+      --accent2: #ff6b35;
+      --accent3: #7c3aed;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --ctl: #00d4ff;
+      --atl: #ff6b35;
+      --tsb: #4ade80;
+      --hrv: #a78bfa;
+      --sleep: #fb923c;
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 32px 24px; min-height: 100vh; }
+    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 32px; }
+    h1 span { color: var(--accent); }
+    .subtitle { color: var(--muted); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); display: inline-block; }
+    .badge { background: #1e293b; color: var(--accent2); font-size: 10px; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.1em; display: none; }
+    .badge.visible { display: inline-block; }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; }
+    .card-glow { position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+
+    /* Login */
+    #login-card { max-width: 480px; margin-bottom: 32px; }
+    #login-card p { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+    .input-row { display: flex; gap: 10px; }
+    input[type=password] { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 13px; font-family: 'DM Mono', monospace; outline: none; }
+    .btn { cursor: pointer; transition: all 0.2s; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; padding: 10px 20px; }
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-secondary { background: transparent; border: 1px solid var(--border) !important; color: var(--muted); width: 100%; margin-top: 12px; padding: 8px 16px; font-size: 12px; }
+
+    /* Loading */
+    #loading { display: none; align-items: center; gap: 10px; color: var(--accent); font-size: 14px; margin-bottom: 24px; }
+    #loading.visible { display: flex; }
+    .spinner { width: 16px; height: 16px; border: 2px solid var(--accent); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error */
+    #error-msg { display: none; color: var(--accent2); font-size: 12px; margin-bottom: 16px; padding: 10px 14px; background: #1a0a00; border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; }
+    #error-msg.visible { display: block; }
+
+    /* Dashboard */
+    #dashboard { display: none; flex-direction: column; gap: 24px; }
+    #dashboard.visible { display: flex; }
+
+    /* KPI row */
+    .kpi-row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .kpi-card { flex: 1; min-width: 140px; }
+    .kpi-label { color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+    .kpi-value { font-size: 36px; font-weight: 700; font-family: 'DM Mono', monospace; line-height: 1; }
+    .kpi-unit { color: var(--muted); font-size: 14px; margin-left: 4px; }
+    .kpi-sub { color: var(--muted); font-size: 12px; margin-top: 6px; }
+
+    /* Section title */
+    .section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .section-bar { width: 3px; height: 18px; border-radius: 2px; }
+    .section-label { color: var(--text); font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    /* Charts */
+    .chart-wrap { position: relative; height: 220px; }
+
+    /* Reload */
+    #reload-btn { display: none; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 10px 24px; font-size: 12px; cursor: pointer; transition: all 0.2s; margin: 0 auto; }
+    #reload-btn:hover { opacity: 0.85; }
+    #reload-btn.visible { display: block; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+  <div class="subtitle"><span class="dot"></span> ATHLETE i124712 <span class="badge" id="mock-badge">ESIMERKKIDATA</span></div>
+  <h1>Training <span>Dashboard</span></h1>
+
+  <!-- Login -->
+  <div class="card" id="login-card">
+    <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--accent), transparent)"></div>
+    <p>Syötä Intervals.icu API-avain (Settings → API Key)</p>
+    <div class="input-row">
+      <input type="password" id="api-input" placeholder="API key..." />
+      <button class="btn btn-primary" onclick="connect()">Yhdistä</button>
+    </div>
+    <button class="btn btn-secondary" onclick="loadMock()">Katso esimerkkidatalla →</button>
+  </div>
+
+  <!-- Loading -->
+  <div id="loading"><div class="spinner"></div> Haetaan dataa...</div>
+
+  <!-- Error -->
+  <div id="error-msg"></div>
+
+  <!-- Dashboard -->
+  <div id="dashboard">
+    <!-- KPI -->
+    <div class="kpi-row">
+      <div class="card kpi-card">
+        <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--ctl), transparent)"></div>
+        <div class="kpi-label">CTL (kunto)</div>
+        <div><span class="kpi-value" id="kpi-ctl" style="color:var(--ctl)">–</span></div>
+        <div class="kpi-sub">Chronic Training Load</div>
+      </div>
+      <div class="card kpi-card">
+        <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--atl), transparent)"></div>
+        <div class="kpi-label">ATL (kuormitus)</div>
+        <div><span class="kpi-value" id="kpi-atl" style="color:var(--atl)">–</span></div>
+        <div class="kpi-sub">Acute Training Load</div>
+      </div>
+      <div class="card kpi-card">
+        <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--tsb), transparent)"></div>
+        <div class="kpi-label">TSB (muoto)</div>
+        <div><span class="kpi-value" id="kpi-tsb" style="color:var(--tsb)">–</span></div>
+        <div class="kpi-sub" id="kpi-tsb-sub">–</div>
+      </div>
+      <div class="card kpi-card">
+        <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--hrv), transparent)"></div>
+        <div class="kpi-label">HRV (viimeisin)</div>
+        <div><span class="kpi-value" id="kpi-hrv" style="color:var(--hrv)">–</span><span class="kpi-unit">ms</span></div>
+        <div class="kpi-sub">Sydänsykevälivaihtelu</div>
+      </div>
+      <div class="card kpi-card">
+        <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--sleep), transparent)"></div>
+        <div class="kpi-label">Uni (viimeisin)</div>
+        <div><span class="kpi-value" id="kpi-sleep" style="color:var(--sleep)">–</span><span class="kpi-unit">h</span></div>
+        <div class="kpi-sub">Unen kesto</div>
+      </div>
+      <div class="card kpi-card">
+        <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--accent), transparent)"></div>
+        <div class="kpi-label">Volyymi 12vk</div>
+        <div><span class="kpi-value" id="kpi-vol" style="color:var(--accent)">–</span><span class="kpi-unit">km</span></div>
+        <div class="kpi-sub">Yhteensä</div>
+      </div>
+    </div>
+
+    <!-- Fitness chart -->
+    <div class="card">
+      <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--ctl), transparent)"></div>
+      <div class="section-title">
+        <div class="section-bar" style="background:var(--ctl)"></div>
+        <span class="section-label">Fitness-käyrät – CTL / ATL / TSB</span>
+      </div>
+      <div class="chart-wrap"><canvas id="chart-fitness"></canvas></div>
+    </div>
+
+    <!-- Volume chart -->
+    <div class="card">
+      <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--accent2), transparent)"></div>
+      <div class="section-title">
+        <div class="section-bar" style="background:var(--accent2)"></div>
+        <span class="section-label">Viikoittainen volyymi (km)</span>
+      </div>
+      <div class="chart-wrap"><canvas id="chart-volume"></canvas></div>
+    </div>
+
+    <!-- HRV chart -->
+    <div class="card">
+      <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--hrv), transparent)"></div>
+      <div class="section-title">
+        <div class="section-bar" style="background:var(--hrv)"></div>
+        <span class="section-label">HRV &amp; Uni</span>
+      </div>
+      <div class="chart-wrap"><canvas id="chart-hrv"></canvas></div>
+    </div>
+
+    <button id="reload-btn" onclick="reloadData()">↻ Päivitä data</button>
+  </div>
+
+<script>
+const WORKER_URL = "https://intervals-proxy.dash-cloudflare-com-overkill259.workers.dev";
+let currentApiKey = null;
+let fitnessChart, volumeChart, hrvChart;
+
+const chartDefaults = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { labels: { color: '#64748b', font: { size: 11 } } } },
+  scales: {
+    x: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: '#1e2d45' }, border: { display: false } },
+    y: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: '#1e2d45' }, border: { display: false } }
+  }
+};
+
+async function fetchIntervals(apiKey, endpoint) {
+  const res = await fetch(`${WORKER_URL}?path=${encodeURIComponent(endpoint)}`, {
+    headers: { "X-API-Key": apiKey }
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.json();
+}
+
+function connect() {
+  const key = document.getElementById('api-input').value.trim();
+  if (!key) return;
+  currentApiKey = key;
+  loadData(key);
+}
+
+document.getElementById('api-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') connect();
+});
+
+async function loadData(apiKey) {
+  setLoading(true);
+  setError(null);
+  try {
+    const oldest84 = new Date(Date.now() - 84*86400000).toISOString().slice(0,10);
+    const oldest30 = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
+
+    const [activities, wellness] = await Promise.all([
+      fetchIntervals(apiKey, `activities?oldest=${oldest84}&limit=200`),
+      fetchIntervals(apiKey, `wellness?oldest=${oldest30}`)
+    ]);
+
+    if (!Array.isArray(activities)) throw new Error("Virheellinen vastaus");
+
+    // Weekly volume
+    const weekMap = {};
+    activities.forEach(act => {
+      const d = new Date(act.start_date_local);
+      const ws = new Date(d);
+      ws.setDate(d.getDate() - d.getDay() + 1);
+      const k = ws.toLocaleDateString('fi-FI', { day:'numeric', month:'numeric' });
+      if (!weekMap[k]) weekMap[k] = { week: k, juoksu: 0, pyörä: 0, muu: 0 };
+      const km = (act.distance || 0) / 1000;
+      const t = (act.type || '').toLowerCase();
+      if (t.includes('run')) weekMap[k].juoksu += km;
+      else if (t.includes('ride') || t.includes('cycl')) weekMap[k].pyörä += km;
+      else weekMap[k].muu += km;
+    });
+    const weeks = Object.values(weekMap).slice(-12).map(w => ({
+      ...w, juoksu: Math.round(w.juoksu), pyörä: Math.round(w.pyörä), muu: Math.round(w.muu)
+    }));
+
+    const wArr = Array.isArray(wellness) ? wellness : [];
+    const fitnessData = wArr.map(w => ({
+      date: new Date(w.id).toLocaleDateString('fi-FI', { day:'numeric', month:'numeric' }),
+      CTL: w.ctl ? Math.round(w.ctl) : null,
+      ATL: w.atl ? Math.round(w.atl) : null,
+      TSB: w.ctl && w.atl ? Math.round(w.ctl - w.atl) : null
+    })).filter(w => w.CTL);
+
+    const hrvData = wArr.map(w => ({
+      date: new Date(w.id).toLocaleDateString('fi-FI', { day:'numeric', month:'numeric' }),
+      HRV: w.hrv || null,
+      uni: w.sleepSecs ? +(w.sleepSecs/3600).toFixed(1) : null
+    })).filter(w => w.HRV || w.uni);
+
+    renderDashboard({ weeks, fitness: fitnessData, hrv: hrvData }, false);
+  } catch(e) {
+    setError(`Virhe: ${e.message} – tarkista API-avain. Näytetään esimerkkidata.`);
+    renderDashboard(generateMockData(), true);
+  }
+  setLoading(false);
+}
+
+function reloadData() {
+  if (currentApiKey) loadData(currentApiKey);
+}
+
+function loadMock() {
+  renderDashboard(generateMockData(), true);
+}
+
+function renderDashboard(data, isMock) {
+  document.getElementById('login-card').style.display = 'none';
+  document.getElementById('mock-badge').className = isMock ? 'badge visible' : 'badge';
+  document.getElementById('reload-btn').className = !isMock ? 'visible' : '';
+
+  const lastFit = data.fitness[data.fitness.length - 1] || {};
+  const lastHrv = data.hrv[data.hrv.length - 1] || {};
+  const totalKm = data.weeks.reduce((s,w) => s + w.juoksu + w.pyörä + w.muu, 0);
+
+  document.getElementById('kpi-ctl').textContent = lastFit.CTL ?? '–';
+  document.getElementById('kpi-atl').textContent = lastFit.ATL ?? '–';
+  document.getElementById('kpi-tsb').textContent = lastFit.TSB ?? '–';
+  document.getElementById('kpi-tsb').style.color = (lastFit.TSB >= 0) ? '#4ade80' : '#ff6b35';
+  document.getElementById('kpi-tsb-sub').textContent = lastFit.TSB != null ? (lastFit.TSB >= 0 ? 'Hyvä muoto' : 'Väsynyt') : '–';
+  document.getElementById('kpi-hrv').textContent = lastHrv.HRV ?? '–';
+  document.getElementById('kpi-sleep').textContent = lastHrv.uni ?? '–';
+  document.getElementById('kpi-vol').textContent = Math.round(totalKm);
+
+  document.getElementById('dashboard').className = 'visible';
+
+  // Fitness chart
+  if (fitnessChart) fitnessChart.destroy();
+  fitnessChart = new Chart(document.getElementById('chart-fitness'), {
+    type: 'line',
+    data: {
+      labels: data.fitness.map(d => d.date),
+      datasets: [
+        { label: 'CTL', data: data.fitness.map(d => d.CTL), borderColor: '#00d4ff', borderWidth: 2, pointRadius: 0, tension: 0.3 },
+        { label: 'ATL', data: data.fitness.map(d => d.ATL), borderColor: '#ff6b35', borderWidth: 2, pointRadius: 0, tension: 0.3 },
+        { label: 'TSB', data: data.fitness.map(d => d.TSB), borderColor: '#4ade80', borderWidth: 1.5, borderDash: [4,2], pointRadius: 0, tension: 0.3 }
+      ]
+    },
+    options: { ...chartDefaults }
+  });
+
+  // Volume chart
+  if (volumeChart) volumeChart.destroy();
+  volumeChart = new Chart(document.getElementById('chart-volume'), {
+    type: 'bar',
+    data: {
+      labels: data.weeks.map(w => w.week),
+      datasets: [
+        { label: 'juoksu', data: data.weeks.map(w => w.juoksu), backgroundColor: '#00d4ff', stack: 'a' },
+        { label: 'pyörä', data: data.weeks.map(w => w.pyörä), backgroundColor: '#7c3aed', stack: 'a' },
+        { label: 'muu', data: data.weeks.map(w => w.muu), backgroundColor: '#64748b', stack: 'a' }
+      ]
+    },
+    options: { ...chartDefaults, borderRadius: 4 }
+  });
+
+  // HRV chart
+  if (hrvChart) hrvChart.destroy();
+  hrvChart = new Chart(document.getElementById('chart-hrv'), {
+    type: 'line',
+    data: {
+      labels: data.hrv.map(d => d.date),
+      datasets: [
+        { label: 'HRV (ms)', data: data.hrv.map(d => d.HRV), borderColor: '#a78bfa', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#a78bfa', tension: 0.3, yAxisID: 'y' },
+        { label: 'Uni (h)', data: data.hrv.map(d => d.uni), borderColor: '#fb923c', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#fb923c', tension: 0.3, yAxisID: 'y2' }
+      ]
+    },
+    options: {
+      ...chartDefaults,
+      scales: {
+        x: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: '#1e2d45' }, border: { display: false } },
+        y: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: '#1e2d45' }, border: { display: false } },
+        y2: { position: 'right', min: 4, max: 10, ticks: { color: '#64748b', font: { size: 10 } }, grid: { display: false }, border: { display: false } }
+      }
+    }
+  });
+}
+
+function generateMockData() {
+  const now = new Date();
+  const weeks = Array.from({length:12}, (_,i) => {
+    const d = new Date(now); d.setDate(d.getDate() - (11-i)*7);
+    return { week: d.toLocaleDateString('fi-FI',{day:'numeric',month:'numeric'}), juoksu: Math.floor(20+Math.random()*40), pyörä: Math.floor(30+Math.random()*80), muu: Math.floor(Math.random()*20) };
+  });
+  let ctl=45, atl=40;
+  const fitness = Array.from({length:30}, (_,i) => {
+    const d = new Date(now); d.setDate(d.getDate()-(29-i));
+    const load = 40+Math.random()*60; ctl=ctl*0.95+load*0.05; atl=atl*0.87+load*0.13;
+    return { date: d.toLocaleDateString('fi-FI',{day:'numeric',month:'numeric'}), CTL:Math.round(ctl), ATL:Math.round(atl), TSB:Math.round(ctl-atl) };
+  });
+  const hrv = Array.from({length:14}, (_,i) => {
+    const d = new Date(now); d.setDate(d.getDate()-(13-i));
+    return { date: d.toLocaleDateString('fi-FI',{day:'numeric',month:'numeric'}), HRV:Math.round(55+Math.random()*20), uni:+(6.5+Math.random()*2).toFixed(1) };
+  });
+  return { weeks, fitness, hrv };
+}
+
+function setLoading(v) { document.getElementById('loading').className = v ? 'visible' : ''; }
+function setError(msg) {
+  const el = document.getElementById('error-msg');
+  if (msg) { el.textContent = msg; el.className = 'visible'; }
+  else { el.className = ''; }
+}
+</script>
+</body>
+</html>
