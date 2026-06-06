@@ -9,19 +9,10 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #0a0e1a;
-      --card: #111827;
-      --border: #1e2d45;
-      --accent: #00d4ff;
-      --accent2: #ff6b35;
-      --accent3: #7c3aed;
-      --text: #e2e8f0;
-      --muted: #64748b;
-      --ctl: #00d4ff;
-      --atl: #ff6b35;
-      --tsb: #4ade80;
-      --hrv: #a78bfa;
-      --sleep: #fb923c;
+      --bg: #0a0e1a; --card: #111827; --border: #1e2d45;
+      --accent: #00d4ff; --accent2: #ff6b35; --accent3: #7c3aed;
+      --text: #e2e8f0; --muted: #64748b;
+      --ctl: #00d4ff; --atl: #ff6b35; --tsb: #4ade80; --hrv: #a78bfa; --sleep: #fb923c;
     }
     body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 32px 24px; min-height: 100vh; }
     h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 32px; }
@@ -30,54 +21,54 @@
     .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); display: inline-block; }
     .badge { background: #1e293b; color: var(--accent2); font-size: 10px; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.1em; display: none; }
     .badge.visible { display: inline-block; }
-
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; }
     .card-glow { position: absolute; top: 0; left: 0; right: 0; height: 2px; }
-
-    /* Login */
     #login-card { max-width: 480px; margin-bottom: 32px; }
-    #login-card p { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+    #login-card p { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+    #login-card .input-group { margin-bottom: 12px; }
     .input-row { display: flex; gap: 10px; }
     input[type=password] { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 13px; font-family: 'DM Mono', monospace; outline: none; }
     .btn { cursor: pointer; transition: all 0.2s; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; padding: 10px 20px; }
     .btn:hover { opacity: 0.85; transform: translateY(-1px); }
     .btn-primary { background: var(--accent); color: #000; }
     .btn-secondary { background: transparent; border: 1px solid var(--border) !important; color: var(--muted); width: 100%; margin-top: 12px; padding: 8px 16px; font-size: 12px; }
-
-    /* Loading */
     #loading { display: none; align-items: center; gap: 10px; color: var(--accent); font-size: 14px; margin-bottom: 24px; }
     #loading.visible { display: flex; }
     .spinner { width: 16px; height: 16px; border: 2px solid var(--accent); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Error */
     #error-msg { display: none; color: var(--accent2); font-size: 12px; margin-bottom: 16px; padding: 10px 14px; background: #1a0a00; border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; }
     #error-msg.visible { display: block; }
-
-    /* Dashboard */
     #dashboard { display: none; flex-direction: column; gap: 24px; }
     #dashboard.visible { display: flex; }
-
-    /* KPI row */
     .kpi-row { display: flex; gap: 16px; flex-wrap: wrap; }
     .kpi-card { flex: 1; min-width: 140px; }
     .kpi-label { color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
     .kpi-value { font-size: 36px; font-weight: 700; font-family: 'DM Mono', monospace; line-height: 1; }
     .kpi-unit { color: var(--muted); font-size: 14px; margin-left: 4px; }
     .kpi-sub { color: var(--muted); font-size: 12px; margin-top: 6px; }
-
-    /* Section title */
     .section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
     .section-bar { width: 3px; height: 18px; border-radius: 2px; }
     .section-label { color: var(--text); font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
-
-    /* Charts */
     .chart-wrap { position: relative; height: 220px; }
-
-    /* Reload */
     #reload-btn { display: none; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 10px 24px; font-size: 12px; cursor: pointer; transition: all 0.2s; margin: 0 auto; }
     #reload-btn:hover { opacity: 0.85; }
     #reload-btn.visible { display: block; }
+
+    /* AI Analysis */
+    #ai-card { display: none; }
+    #ai-card.visible { display: block; }
+    #ai-btn { background: linear-gradient(135deg, #7c3aed, #00d4ff); color: #fff; border: none; border-radius: 8px; padding: 12px 24px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+    #ai-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    #ai-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    #ai-result { display: none; margin-top: 20px; }
+    #ai-result.visible { display: block; }
+    .ai-section { margin-bottom: 20px; }
+    .ai-section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent3); margin-bottom: 8px; }
+    .ai-text { color: var(--text); font-size: 14px; line-height: 1.7; }
+    .ai-loading { color: var(--muted); font-size: 13px; display: flex; align-items: center; gap: 8px; }
+    #anthropic-key-row { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+    #anthropic-key-row.visible { display: block; }
+    #anthropic-key-row p { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
 
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
@@ -89,26 +80,22 @@
   <div class="subtitle"><span class="dot"></span> ATHLETE i124712 <span class="badge" id="mock-badge">ESIMERKKIDATA</span></div>
   <h1>Training <span>Dashboard</span></h1>
 
-  <!-- Login -->
   <div class="card" id="login-card">
     <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--accent), transparent)"></div>
-    <p>Syötä Intervals.icu API-avain (Settings → API Key)</p>
-    <div class="input-row">
-      <input type="password" id="api-input" placeholder="API key..." />
-      <button class="btn btn-primary" onclick="connect()">Yhdistä</button>
+    <div class="input-group">
+      <p>Intervals.icu API-avain (Settings → API Key)</p>
+      <div class="input-row">
+        <input type="password" id="api-input" placeholder="Intervals API key..." />
+        <button class="btn btn-primary" onclick="connect()">Yhdistä</button>
+      </div>
     </div>
     <button class="btn btn-secondary" onclick="loadMock()">Katso esimerkkidatalla →</button>
   </div>
 
-  <!-- Loading -->
   <div id="loading"><div class="spinner"></div> Haetaan dataa...</div>
-
-  <!-- Error -->
   <div id="error-msg"></div>
 
-  <!-- Dashboard -->
   <div id="dashboard">
-    <!-- KPI -->
     <div class="kpi-row">
       <div class="card kpi-card">
         <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--ctl), transparent)"></div>
@@ -148,7 +135,6 @@
       </div>
     </div>
 
-    <!-- Fitness chart -->
     <div class="card">
       <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--ctl), transparent)"></div>
       <div class="section-title">
@@ -158,7 +144,6 @@
       <div class="chart-wrap"><canvas id="chart-fitness"></canvas></div>
     </div>
 
-    <!-- Volume chart -->
     <div class="card">
       <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--accent2), transparent)"></div>
       <div class="section-title">
@@ -168,7 +153,6 @@
       <div class="chart-wrap"><canvas id="chart-volume"></canvas></div>
     </div>
 
-    <!-- HRV chart -->
     <div class="card">
       <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--hrv), transparent)"></div>
       <div class="section-title">
@@ -178,17 +162,54 @@
       <div class="chart-wrap"><canvas id="chart-hrv"></canvas></div>
     </div>
 
+    <!-- AI Analysis -->
+    <div class="card" id="ai-card">
+      <div class="card-glow" style="background: linear-gradient(90deg, transparent, var(--accent3), transparent)"></div>
+      <div class="section-title">
+        <div class="section-bar" style="background:var(--accent3)"></div>
+        <span class="section-label">AI-analyysi</span>
+      </div>
+
+      <button id="ai-btn" onclick="runAnalysis()">
+        <span>✦</span> Analysoi harjoitteluni
+      </button>
+
+      <div id="anthropic-key-row">
+        <p>Anthropic API-avain (console.anthropic.com → API Keys)</p>
+        <div class="input-row">
+          <input type="password" id="anthropic-input" placeholder="sk-ant-..." />
+          <button class="btn btn-primary" onclick="saveAnthropicKey()">Tallenna</button>
+        </div>
+      </div>
+
+      <div id="ai-result">
+        <div class="ai-section">
+          <div class="ai-section-title">📈 Kunnon kehitys</div>
+          <div class="ai-text" id="ai-fitness"></div>
+        </div>
+        <div class="ai-section">
+          <div class="ai-section-title">🛌 Palautuminen &amp; hyvinvointi</div>
+          <div class="ai-text" id="ai-wellness"></div>
+        </div>
+        <div class="ai-section">
+          <div class="ai-section-title">🎯 Suositus seuraaviksi viikoiksi</div>
+          <div class="ai-text" id="ai-recommendation"></div>
+        </div>
+      </div>
+    </div>
+
     <button id="reload-btn" onclick="reloadData()">↻ Päivitä data</button>
   </div>
 
 <script>
 const WORKER_URL = "https://intervals-proxy.dash-cloudflare-com-overkill259.workers.dev";
 let currentApiKey = null;
+let anthropicKey = null;
+let currentData = null;
 let fitnessChart, volumeChart, hrvChart;
 
 const chartDefaults = {
-  responsive: true,
-  maintainAspectRatio: false,
+  responsive: true, maintainAspectRatio: false,
   plugins: { legend: { labels: { color: '#64748b', font: { size: 11 } } } },
   scales: {
     x: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: '#1e2d45' }, border: { display: false } },
@@ -211,30 +232,22 @@ function connect() {
   loadData(key);
 }
 
-document.getElementById('api-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') connect();
-});
+document.getElementById('api-input').addEventListener('keydown', e => { if (e.key === 'Enter') connect(); });
 
 async function loadData(apiKey) {
-  setLoading(true);
-  setError(null);
+  setLoading(true); setError(null);
   try {
     const oldest84 = new Date(Date.now() - 84*86400000).toISOString().slice(0,10);
     const oldest30 = new Date(Date.now() - 30*86400000).toISOString().slice(0,10);
-
     const [activities, wellness] = await Promise.all([
       fetchIntervals(apiKey, `activities?oldest=${oldest84}&limit=200`),
       fetchIntervals(apiKey, `wellness?oldest=${oldest30}`)
     ]);
-
     if (!Array.isArray(activities)) throw new Error("Virheellinen vastaus");
-
-    // Weekly volume
     const weekMap = {};
     activities.forEach(act => {
       const d = new Date(act.start_date_local);
-      const ws = new Date(d);
-      ws.setDate(d.getDate() - d.getDay() + 1);
+      const ws = new Date(d); ws.setDate(d.getDate() - d.getDay() + 1);
       const k = ws.toLocaleDateString('fi-FI', { day:'numeric', month:'numeric' });
       if (!weekMap[k]) weekMap[k] = { week: k, juoksu: 0, pyörä: 0, muu: 0 };
       const km = (act.distance || 0) / 1000;
@@ -246,7 +259,6 @@ async function loadData(apiKey) {
     const weeks = Object.values(weekMap).slice(-12).map(w => ({
       ...w, juoksu: Math.round(w.juoksu), pyörä: Math.round(w.pyörä), muu: Math.round(w.muu)
     }));
-
     const wArr = Array.isArray(wellness) ? wellness : [];
     const fitnessData = wArr.map(w => ({
       date: new Date(w.id).toLocaleDateString('fi-FI', { day:'numeric', month:'numeric' }),
@@ -254,13 +266,11 @@ async function loadData(apiKey) {
       ATL: w.atl ? Math.round(w.atl) : null,
       TSB: w.ctl && w.atl ? Math.round(w.ctl - w.atl) : null
     })).filter(w => w.CTL);
-
     const hrvData = wArr.map(w => ({
       date: new Date(w.id).toLocaleDateString('fi-FI', { day:'numeric', month:'numeric' }),
       HRV: w.hrv || null,
       uni: w.sleepSecs ? +(w.sleepSecs/3600).toFixed(1) : null
     })).filter(w => w.HRV || w.uni);
-
     renderDashboard({ weeks, fitness: fitnessData, hrv: hrvData }, false);
   } catch(e) {
     setError(`Virhe: ${e.message} – tarkista API-avain. Näytetään esimerkkidata.`);
@@ -269,18 +279,101 @@ async function loadData(apiKey) {
   setLoading(false);
 }
 
-function reloadData() {
-  if (currentApiKey) loadData(currentApiKey);
+function reloadData() { if (currentApiKey) loadData(currentApiKey); }
+function loadMock() { renderDashboard(generateMockData(), true); }
+
+function saveAnthropicKey() {
+  const key = document.getElementById('anthropic-input').value.trim();
+  if (!key) return;
+  anthropicKey = key;
+  document.getElementById('anthropic-key-row').className = '';
+  runAnalysis();
 }
 
-function loadMock() {
-  renderDashboard(generateMockData(), true);
+async function runAnalysis() {
+  if (!anthropicKey) {
+    document.getElementById('anthropic-key-row').className = 'visible';
+    return;
+  }
+  if (!currentData) return;
+
+  const btn = document.getElementById('ai-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Analysoidaan...';
+
+  const result = document.getElementById('ai-result');
+  result.className = 'visible';
+  document.getElementById('ai-fitness').innerHTML = '<div class="ai-loading"><div class="spinner"></div> Claude analysoi...</div>';
+  document.getElementById('ai-wellness').innerHTML = '';
+  document.getElementById('ai-recommendation').innerHTML = '';
+
+  const d = currentData;
+  const lastFit = d.fitness[d.fitness.length - 1] || {};
+  const lastHrv = d.hrv[d.hrv.length - 1] || {};
+  const totalKm = d.weeks.reduce((s,w) => s + w.juoksu + w.pyörä + w.muu, 0);
+  const avgHrv = d.hrv.filter(h => h.HRV).reduce((s,h,_,a) => s + h.HRV/a.length, 0).toFixed(0);
+  const avgSleep = d.hrv.filter(h => h.uni).reduce((s,h,_,a) => s + h.uni/a.length, 0).toFixed(1);
+
+  const prompt = `Olet kokenut urheiluvalmentaja. Analysoi alla oleva harjoitteludata ja anna suomenkielinen analyysi.
+
+HARJOITTELUDATA (viimeiset 30 päivää):
+- CTL (kuntotaso): ${lastFit.CTL ?? 'ei dataa'}
+- ATL (akuutti kuormitus): ${lastFit.ATL ?? 'ei dataa'}
+- TSB (muoto/vireystila): ${lastFit.TSB ?? 'ei dataa'}
+- Kokonaisvolyymi 12 viikkoa: ${Math.round(totalKm)} km
+- Viikkovolyymit (juoksu/pyörä/muu km): ${d.weeks.slice(-4).map(w => `${w.week}: ${w.juoksu}/${w.pyörä}/${w.muu}`).join(', ')}
+- HRV keskiarvo: ${avgHrv} ms
+- Uni keskiarvo: ${avgSleep} h
+- Viimeisin HRV: ${lastHrv.HRV ?? 'ei dataa'} ms
+- Viimeisin uni: ${lastHrv.uni ?? 'ei dataa'} h
+- CTL-kehitys (viimeiset pisteet): ${d.fitness.slice(-5).map(f => f.CTL).join(' → ')}
+
+Vastaa TÄSMÄLLEEN tässä JSON-muodossa, ei muuta tekstiä:
+{
+  "fitness": "2-3 lausetta kuntotason ja volyymikehityksen tilasta",
+  "wellness": "2-3 lausetta palautumisesta, HRV:stä ja unesta",
+  "recommendation": "3-4 lausetta konkreettisista suosituksista seuraaviksi 2 viikoksi"
+}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': anthropicKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!res.ok) throw new Error(`API virhe ${res.status}`);
+    const data = await res.json();
+    const text = data.content[0].text.trim();
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    document.getElementById('ai-fitness').textContent = parsed.fitness;
+    document.getElementById('ai-wellness').textContent = parsed.wellness;
+    document.getElementById('ai-recommendation').textContent = parsed.recommendation;
+  } catch(e) {
+    document.getElementById('ai-fitness').textContent = `Virhe: ${e.message}`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>✦</span> Päivitä analyysi';
 }
 
 function renderDashboard(data, isMock) {
+  currentData = data;
   document.getElementById('login-card').style.display = 'none';
   document.getElementById('mock-badge').className = isMock ? 'badge visible' : 'badge';
   document.getElementById('reload-btn').className = !isMock ? 'visible' : '';
+  document.getElementById('ai-card').className = isMock ? 'card' : 'card visible';
 
   const lastFit = data.fitness[data.fitness.length - 1] || {};
   const lastHrv = data.hrv[data.hrv.length - 1] || {};
@@ -294,10 +387,8 @@ function renderDashboard(data, isMock) {
   document.getElementById('kpi-hrv').textContent = lastHrv.HRV ?? '–';
   document.getElementById('kpi-sleep').textContent = lastHrv.uni ?? '–';
   document.getElementById('kpi-vol').textContent = Math.round(totalKm);
-
   document.getElementById('dashboard').className = 'visible';
 
-  // Fitness chart
   if (fitnessChart) fitnessChart.destroy();
   fitnessChart = new Chart(document.getElementById('chart-fitness'), {
     type: 'line',
@@ -312,7 +403,6 @@ function renderDashboard(data, isMock) {
     options: { ...chartDefaults }
   });
 
-  // Volume chart
   if (volumeChart) volumeChart.destroy();
   volumeChart = new Chart(document.getElementById('chart-volume'), {
     type: 'bar',
@@ -327,7 +417,6 @@ function renderDashboard(data, isMock) {
     options: { ...chartDefaults, borderRadius: 4 }
   });
 
-  // HRV chart
   if (hrvChart) hrvChart.destroy();
   hrvChart = new Chart(document.getElementById('chart-hrv'), {
     type: 'line',
